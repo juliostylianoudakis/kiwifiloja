@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vitrine Digital — Método V.E.C.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:#07080F;color:#E8E6DF;overflow-x:hidden;cursor:none}
+::selection{background:#C89B3C44;color:#F5D07A}
+:root{
+  --gold:#C89B3C;--gold-lt:#E8B84B;--gold-dim:#6B4E1C;--gold-glow:#C89B3C28;
+  --bg0:#07080F;--bg1:#0C0E1A;--bg2:#111525;--bg3:#161B2E;--bg4:#1B2138;
+  --line:#ffffff09;--line2:#ffffff12;--off:#E8E6DF;--muted:#5E6380;--muted2:#9299B8;
+  --green:#22C55E;--red:#EF4444;--r:8px;--r2:14px;--r3:20px;
+}
+#cursor{position:fixed;width:9px;height:9px;background:var(--gold-lt);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .18s,height .18s,background .18s;mix-blend-mode:screen}
+#cursor-ring{position:fixed;width:34px;height:34px;border:1px solid var(--gold-dim);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .22s,height .22s,border-color .22s}
+body.hovering #cursor{width:5px;height:5px}
+body.hovering #cursor-ring{width:50px;height:50px;border-color:var(--gold-lt)}
+#noise{position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.022;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:200px}
+#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none}
+#progress-bar{position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--gold),var(--gold-lt));z-index:200;width:0%;transition:width .08s linear}
+main{position:relative;z-index:2}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:18px 48px;display:flex;align-items:center;justify-content:space-between;transition:background .4s,border-color .4s;border-bottom:1px solid transparent}
+nav.scrolled{background:#07080FCC;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-color:var(--line2)}
+.nav-logo{font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:17px;color:var(--gold-lt);letter-spacing:-.01em}
+.nav-logo span{color:var(--muted2);font-weight:400}
+.nav-cta{font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;color:var(--bg0);background:var(--gold-lt);padding:9px 22px;border-radius:6px;border:none;cursor:none;transition:transform .15s,box-shadow .15s;letter-spacing:.02em}
+.nav-cta:hover{transform:translateY(-1px);box-shadow:0 8px 24px var(--gold-glow)}
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:120px 24px 80px;position:relative;overflow:hidden}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:var(--gold-glow);border:1px solid #C89B3C55;color:var(--gold-lt);font-size:11px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;padding:6px 18px;border-radius:30px;margin-bottom:32px;animation:fadeUp .8s ease both}
+.badge-dot{width:6px;height:6px;background:var(--gold-lt);border-radius:50%;box-shadow:0 0 8px var(--gold-lt);animation:pulse 2s ease infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.6)}}
+.hero h1{font-family:'Cormorant Garamond',serif;font-size:clamp(40px,7vw,86px);font-weight:600;line-height:.94;letter-spacing:-.02em;color:var(--off);margin-bottom:24px;animation:fadeUp .8s .12s ease both}
+.hero h1 .hi{color:var(--gold-lt);display:block}
+.hero h1 .hd{color:transparent;-webkit-text-stroke:1px #ffffff1A;display:block}
+.hero-sub{font-size:clamp(15px,2vw,18px);line-height:1.7;color:var(--muted2);max-width:580px;margin:0 auto 40px;font-weight:300;animation:fadeUp .8s .22s ease both}
+.hero-actions{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:center;animation:fadeUp .8s .32s ease both}
+.btn-primary{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:15px;color:var(--bg0);background:var(--gold-lt);padding:15px 38px;border-radius:8px;border:none;cursor:none;position:relative;overflow:hidden;transition:transform .15s,box-shadow .2s;letter-spacing:.02em}
+.btn-primary::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,#ffffff28,transparent);transform:translateX(-100%);transition:transform .55s}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 16px 44px var(--gold-glow)}
+.btn-primary:hover::before{transform:translateX(100%)}
+.btn-ghost{font-family:'Plus Jakarta Sans',sans-serif;font-weight:500;font-size:14px;color:var(--muted2);padding:13px 22px;border:1px solid var(--line2);border-radius:8px;background:transparent;cursor:none;transition:color .2s,border-color .2s}
+.btn-ghost:hover{color:var(--off);border-color:var(--gold-dim)}
+.hero-note{margin-top:16px;font-size:13px;color:var(--muted);animation:fadeUp .8s .42s ease both}
+.hero-note s{color:#2F3147}
+.accent{color:var(--gold-lt);font-weight:500}
+.hero-pills{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:40px;animation:fadeUp .8s .5s ease both}
+.pill{font-size:11px;color:var(--muted2);background:var(--bg2);border:1px solid var(--line2);padding:5px 14px;border-radius:20px;letter-spacing:.04em}
+.scroll-ind{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;animation:fadeUp .8s .8s ease both}
+.scroll-ind span{font-size:10px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase}
+.scroll-line{width:1px;height:40px;background:linear-gradient(to bottom,var(--gold-dim),transparent);animation:sline 2.2s ease infinite}
+@keyframes sline{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+section{padding:100px 24px;position:relative}
+.container{max-width:1100px;margin:0 auto}
+.container-sm{max-width:760px;margin:0 auto}
+.eyebrow{font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.eyebrow::before{content:'';display:block;width:24px;height:1px;background:var(--gold)}
+.eyebrow-center{justify-content:center}
+.eyebrow-center::before{display:none}
+.sh2{font-family:'Cormorant Garamond',serif;font-size:clamp(30px,4.8vw,54px);font-weight:600;letter-spacing:-.01em;line-height:1.06;color:var(--off);margin-bottom:20px}
+.slead{font-size:17px;line-height:1.7;color:var(--muted2);font-weight:300;max-width:560px}
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.d1{transition-delay:.1s}.d2{transition-delay:.2s}.d3{transition-delay:.3s}.d4{transition-delay:.4s}
+.pain-sec{background:var(--bg1)}
+.pain-intro{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:start;margin-bottom:64px}
+@media(max-width:768px){.pain-intro{grid-template-columns:1fr;gap:32px}.pain-cards{grid-template-columns:1fr!important}.vec-track{grid-template-columns:1fr!important}.vec-track::before{display:none}.vec-item::after{display:none!important}.modules-layout{grid-template-columns:1fr!important}.obj-grid{grid-template-columns:1fr!important}.bonus-grid{grid-template-columns:1fr!important}nav{padding:14px 20px}}
+.stat-num{font-family:'Cormorant Garamond',serif;font-size:clamp(64px,10vw,110px);font-weight:800;line-height:1;color:transparent;-webkit-text-stroke:1px var(--gold-dim);display:block;margin-bottom:10px}
+.stat-label{font-size:14px;color:var(--muted2);font-weight:300;line-height:1.65}
+.pain-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line2);border:1px solid var(--line2);border-radius:var(--r2);overflow:hidden}
+.pain-card{background:var(--bg1);padding:28px;position:relative;overflow:hidden;transition:background .3s;cursor:none}
+.pain-card:hover{background:var(--bg2)}
+.pain-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--red),transparent);opacity:0;transition:opacity .3s}
+.pain-card:hover::before{opacity:1}
+.pain-num{font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:700;color:var(--red);letter-spacing:.12em;margin-bottom:14px;opacity:.5}
+.pain-card h3{font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;color:var(--off);margin-bottom:10px;line-height:1.3}
+.pain-card p{font-size:13px;color:var(--muted2);line-height:1.65;font-weight:300}
+.vec-sec{background:var(--bg0);overflow:hidden}
+.vec-hdr{text-align:center;margin-bottom:72px}
+.vec-track{display:grid;grid-template-columns:repeat(3,1fr);position:relative;max-width:980px;margin:0 auto}
+.vec-track::before{content:'';position:absolute;top:58px;left:16%;right:16%;height:1px;background:linear-gradient(90deg,transparent,var(--gold-dim),transparent)}
+.vec-item{padding:40px 28px;text-align:center;position:relative;cursor:none;transition:transform .35s}
+.vec-item:hover{transform:translateY(-10px)}
+.vec-item:not(:last-child)::after{content:'';position:absolute;top:0;right:0;bottom:0;width:1px;background:var(--line2)}
+.vec-icon{width:78px;height:78px;border-radius:50%;border:1px solid var(--gold-dim);display:flex;align-items:center;justify-content:center;margin:0 auto 24px;position:relative;transition:border-color .3s,box-shadow .3s}
+.vec-item:hover .vec-icon{border-color:var(--gold-lt);box-shadow:0 0 36px var(--gold-glow)}
+.vec-letter{font-family:'Plus Jakarta Sans',sans-serif;font-size:34px;font-weight:800;color:var(--gold-lt);line-height:1}
+.vec-ring{position:absolute;inset:-9px;border-radius:50%;border:1px solid var(--gold-dim);opacity:0;transition:opacity .3s,transform .3s}
+.vec-item:hover .vec-ring{opacity:.35;transform:scale(1.06)}
+.vec-step{font-size:10px;font-weight:700;color:var(--gold-dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
+.vec-title{font-family:'Plus Jakarta Sans',sans-serif;font-size:18px;font-weight:700;color:var(--off);margin-bottom:12px}
+.vec-desc{font-size:13px;color:var(--muted2);line-height:1.7;font-weight:300}
+.mod-sec{background:var(--bg1)}
+.modules-layout{display:grid;grid-template-columns:1fr 1.55fr;gap:64px;align-items:start}
+.mod-sticky{position:sticky;top:120px}
+.mod-box{margin-top:28px;padding:20px;background:var(--bg2);border:1px solid var(--line2);border-radius:var(--r2)}
+.mod-box-label{font-size:10px;color:var(--gold);font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px}
+.mod-box-row{display:flex;align-items:center;gap:10px;padding:5px 0}
+.mod-box-row span{font-size:13px;color:var(--muted2)}
+.ch-list{display:flex;flex-direction:column;border:1px solid var(--line2);border-radius:var(--r2);overflow:hidden}
+.ch{display:flex;align-items:flex-start;gap:14px;padding:17px 20px;border-bottom:1px solid var(--line);transition:background .2s;cursor:none;position:relative;overflow:hidden}
+.ch:last-child{border-bottom:none}
+.ch::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--gold-lt);transform:scaleY(0);transition:transform .25s;transform-origin:top}
+.ch:hover{background:var(--bg2)}
+.ch:hover::before{transform:scaleY(1)}
+.ch-num{font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:700;color:var(--gold-dim);min-width:26px;padding-top:2px;letter-spacing:.06em}
+.ch-title{font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:700;color:var(--muted2);transition:color .2s;line-height:1.4;flex:1}
+.ch:hover .ch-title{color:var(--off)}
+.ch-badge{font-size:10px;color:var(--gold-dim);border:1px solid var(--gold-dim);padding:2px 8px;border-radius:10px;white-space:nowrap;flex-shrink:0;font-weight:500;letter-spacing:.04em;opacity:0;transition:opacity .2s;margin-top:2px}
+.ch:hover .ch-badge{opacity:1}
+.bonus-sec{background:var(--bg0)}
+.bonus-hdr{text-align:center;margin-bottom:60px}
+.bonus-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line2);border:1px solid var(--line2);border-radius:var(--r2);overflow:hidden}
+.bcard{background:var(--bg0);padding:30px 26px;position:relative;overflow:hidden;transition:background .3s;cursor:none}
+.bcard:hover{background:var(--bg1)}
+.bcard-glow{position:absolute;top:-40px;right:-40px;width:110px;height:110px;background:var(--gold-glow);border-radius:50%;filter:blur(28px);opacity:0;transition:opacity .4s}
+.bcard:hover .bcard-glow{opacity:1}
+.btag{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);background:var(--gold-glow);border:1px solid #C89B3C44;padding:3px 10px;border-radius:4px;margin-bottom:14px}
+.bcard h3{font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;color:var(--off);margin-bottom:10px;line-height:1.3}
+.bcard p{font-size:13px;color:var(--muted2);line-height:1.65;font-weight:300;margin-bottom:14px}
+.bval{display:flex;align-items:center;gap:8px}
+.bval s{font-size:12px;color:var(--muted)}
+.bval .free{font-size:12px;color:var(--green);font-weight:500;font-family:'Plus Jakarta Sans',sans-serif}
+.obj-sec{background:var(--bg1)}
+.obj-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:48px}
+.ocard{background:var(--bg2);border:1px solid var(--line2);border-radius:var(--r2);padding:26px;position:relative;overflow:hidden;transition:border-color .3s,transform .2s;cursor:none}
+.ocard:hover{border-color:var(--gold-dim);transform:translateY(-2px)}
+.ocard-q{font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:700;color:var(--muted2);margin-bottom:12px;font-style:italic;line-height:1.5}
+.ocard-q::before{content:'"';color:var(--gold-dim);font-size:22px;font-family:'Plus Jakarta Sans',sans-serif;display:block;line-height:.75;margin-bottom:8px}
+.ocard-a{font-size:13px;color:var(--off);line-height:1.7;font-weight:300}
+.ocard-bar{position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold-dim),transparent);transform:scaleX(0);transform-origin:left;transition:transform .4s}
+.ocard:hover .ocard-bar{transform:scaleX(1)}
+.offer-sec{background:var(--bg0);padding:120px 24px}
+.offer-wrap{max-width:660px;margin:0 auto;text-align:center}
+.offer-box{background:var(--bg2);border:1px solid var(--gold-dim);border-radius:var(--r3);padding:44px 36px;position:relative;overflow:hidden;margin-top:44px}
+.offer-glow{position:absolute;top:-80px;left:50%;transform:translateX(-50%);width:380px;height:200px;background:var(--gold-glow);border-radius:50%;filter:blur(60px);pointer-events:none}
+.offer-corner{position:absolute;top:0;right:0;width:72px;height:72px;background:linear-gradient(225deg,var(--gold-dim),transparent);opacity:.25}
+.offer-items{border:1px solid var(--line2);border-radius:var(--r);overflow:hidden;margin-bottom:28px;text-align:left}
+.orow{display:flex;justify-content:space-between;align-items:center;padding:11px 16px;border-bottom:1px solid var(--line);transition:background .2s,padding .18s;cursor:none}
+.orow:last-child{border-bottom:none}
+.orow:hover{background:var(--bg3);padding-left:22px}
+.orow.tot{background:var(--bg3);border-top:1px solid var(--line2)}
+.orow-n{font-size:13px;color:var(--muted2)}
+.orow-n b{color:var(--off);font-family:'Plus Jakarta Sans',sans-serif;font-size:12px}
+.orow-v{font-size:13px;color:var(--muted);font-weight:500}
+.orow.tot .orow-n{color:var(--gold-lt);font-weight:500;font-family:'Plus Jakarta Sans',sans-serif}
+.orow.tot .orow-v{color:var(--gold-lt);font-weight:700}
+.price-from{font-size:14px;color:var(--muted);margin-bottom:6px}
+.price-from s{color:#252840}
+.price-main{font-family:'Cormorant Garamond',serif;font-size:70px;font-weight:800;color:var(--gold-lt);line-height:1;letter-spacing:-.04em;margin-bottom:4px}
+.price-pre{font-size:26px;vertical-align:super;font-weight:700}
+.price-note{font-size:12px;color:var(--muted);margin-bottom:28px}
+.cta-main{display:block;width:100%;font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:16px;color:var(--bg0);background:var(--gold-lt);padding:17px;border-radius:10px;border:none;cursor:none;position:relative;overflow:hidden;transition:transform .15s,box-shadow .2s;letter-spacing:.02em;margin-bottom:14px}
+.cta-main::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,#ffffff22,transparent);transform:translateX(-100%);transition:transform .6s}
+.cta-main:hover{transform:translateY(-2px);box-shadow:0 20px 52px var(--gold-glow)}
+.cta-main:hover::after{transform:translateX(100%)}
+.guarantee{display:flex;align-items:center;gap:12px;background:var(--bg3);border:1px solid var(--line2);border-radius:var(--r);padding:14px 16px;margin-top:16px;text-align:left}
+.g-icon{width:34px;height:34px;border-radius:50%;background:#22C55E15;border:1px solid #22C55E30;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px}
+.g-txt{font-size:12px;color:var(--muted2);line-height:1.6}
+.g-txt b{color:var(--off)}
+footer{padding:40px 24px;border-top:1px solid var(--line2);text-align:center}
+.foot-logo{font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:800;color:var(--gold-lt);margin-bottom:8px}
+footer p{font-size:12px;color:var(--muted);line-height:1.9}
+.particle{position:absolute;border-radius:50%;background:var(--gold-lt);animation:pfloat linear infinite;pointer-events:none}
+@keyframes pfloat{from{transform:translateY(0) rotate(0);opacity:0}10%{opacity:.5}90%{opacity:.1}to{transform:translateY(-100vh) rotate(720deg);opacity:0}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+
+</style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+<div id="noise"></div>
+<canvas id="bg-canvas"></canvas>
+<main>
+<nav id="nav">
+  <div class="nav-logo">Vitrine<span>Digital</span></div>
+  <button class="nav-cta" onclick="window.open('https://pay.kiwify.com.br/Qmlm4E8','_blank')">Garantir acesso — R$ 67</button>
+</nav>
+
+<section class="hero" id="hero">
+  <div class="hero-badge"><span class="badge-dot"></span>Método V.E.C. — Para Negócios Locais</div>
+  <h1>Seu Instagram<br><em class="hi">deveria vender</em><em class="hd">todos os dias.</em></h1>
+  <p class="hero-sub">O método completo para donos de loja, salão, barbearia, restaurante e clínica transformarem seguidores em clientes — sem agência, sem anúncio pago, sem virar influencer.</p>
+  <div class="hero-actions">
+    <button class="btn-primary" onclick="window.open('https://pay.kiwify.com.br/Qmlm4E8','_blank')">Quero meu acesso agora</button>
+    <button class="btn-ghost" onclick="document.getElementById('vec').scrollIntoView({behavior:'smooth'})">Como funciona</button>
+  </div>
+  <p class="hero-note">Pacote completo de <s>R$ 239</s> por apenas <span class="accent">R$ 67</span> — garantia de 7 dias</p>
+  <div class="hero-pills">
+    <span class="pill">Lojas</span><span class="pill">Salões</span><span class="pill">Barbearias</span>
+    <span class="pill">Restaurantes</span><span class="pill">Clínicas</span><span class="pill">Joalherias</span><span class="pill">Estúdios</span>
+  </div>
+  <div class="scroll-ind"><span>Scroll</span><div class="scroll-line"></div></div>
+</section>
+
+<section class="pain-sec" id="pain">
+  <div class="container">
+    <div class="pain-intro reveal">
+      <div>
+        <div class="eyebrow">O problema</div>
+        <h2 class="sh2">Você posta.<br>O caixa não responde.</h2>
+        <p class="slead">O problema raramente é o algoritmo. É que conteúdo sem estratégia de vendas não passa de ruído — e o cliente vai para o concorrente.</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:28px">
+        <div class="reveal d1"><span class="stat-num" data-count="73">0</span><span class="stat-label">% dos negócios locais no Instagram nunca converteram um seguidor em cliente via direct</span></div>
+        <div class="reveal d2"><span class="stat-num" data-count="1">0</span><span class="stat-label">hora — tempo que um lead leva para esfriar após o primeiro contato sem resposta</span></div>
+      </div>
+    </div>
+    <div class="pain-cards reveal d1">
+      <div class="pain-card"><div class="pain-num">01</div><h3>Post sem intenção</h3><p>Cada post precisa ter função: atrair, aquecer ou converter. Sem saber qual é, você só ocupa espaço no feed.</p></div>
+      <div class="pain-card"><div class="pain-num">02</div><h3>Bio que não vende</h3><p>Em 5 segundos o cliente decide se fica ou vai embora. Perfil que não explica o que faz perde o cliente antes de falar.</p></div>
+      <div class="pain-card"><div class="pain-num">03</div><h3>CTA genérico — ou zero</h3><p>"Saiba mais" não vende. "Manda QUERO no direct" vende. A diferença está no caixa no fim do dia.</p></div>
+      <div class="pain-card"><div class="pain-num">04</div><h3>Direct sem script</h3><p>Responder tarde, mandar tabela como primeira mensagem, não ter follow-up. O cliente compra do concorrente.</p></div>
+      <div class="pain-card"><div class="pain-num">05</div><h3>Feed só de produto</h3><p>Catálogo não cria desejo. Conteúdo que educa, humaniza e prova — esse é o que traz o cliente até você.</p></div>
+      <div class="pain-card"><div class="pain-num">06</div><h3>WhatsApp desconectado</h3><p>Instagram e WhatsApp são o mesmo funil. Sem estratégia para os dois juntos, você perde o cliente no meio do caminho.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="vec-sec" id="vec">
+  <div class="container">
+    <div class="vec-hdr reveal">
+      <div class="eyebrow eyebrow-center">O método</div>
+      <h2 class="sh2" style="text-align:center">Método V.E.C.</h2>
+      <p class="slead" style="margin:0 auto;text-align:center">Não é sobre postar mais. É sobre postar com intenção. Cada conteúdo tem função definida dentro de um ciclo que transforma atenção em venda.</p>
+    </div>
+    <div class="vec-track">
+      <div class="vec-item reveal d1">
+        <div class="vec-icon"><span class="vec-letter">V</span><div class="vec-ring"></div></div>
+        <div class="vec-step">Fase 01</div>
+        <div class="vec-title">Visibilidade</div>
+        <p class="vec-desc">Aparecer para as pessoas certas, no bairro certo. Reels locais, geolocalização, hashtags de cidade. Não viralizar — alcançar quem pode ser cliente amanhã.</p>
+      </div>
+      <div class="vec-item reveal d2">
+        <div class="vec-icon"><span class="vec-letter">E</span><div class="vec-ring"></div></div>
+        <div class="vec-step">Fase 02</div>
+        <div class="vec-title">Engajamento</div>
+        <p class="vec-desc">Transformar alcance em conexão. Stories interativos, bastidor e autoridade local. Quem interage com você está confiando — e confiança antecede compra.</p>
+      </div>
+      <div class="vec-item reveal d3">
+        <div class="vec-icon"><span class="vec-letter">C</span><div class="vec-ring"></div></div>
+        <div class="vec-step">Fase 03</div>
+        <div class="vec-title">Conversão</div>
+        <p class="vec-desc">Transformar atenção em ação. CTAs diretos, scripts de direct e WhatsApp, ofertas com urgência real. O seguidor se torna cliente pagante.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="mod-sec" id="modules">
+  <div class="container">
+    <div class="modules-layout">
+      <div class="mod-sticky reveal">
+        <div class="eyebrow">O conteúdo</div>
+        <h2 class="sh2">12 capítulos.<br>Zero enrolação.</h2>
+        <p class="slead">Do diagnóstico do perfil ao Plano de 30 Dias. Cada capítulo tem exemplos reais, passo a passo, modelos prontos e aplicação imediata.</p>
+        <div class="mod-box">
+          <div class="mod-box-label">Incluso no produto</div>
+          <div class="mod-box-row"><span style="color:var(--green)">✓</span><span>Mais de 80 páginas de conteúdo</span></div>
+          <div class="mod-box-row"><span style="color:var(--green)">✓</span><span>Exemplos por segmento</span></div>
+          <div class="mod-box-row"><span style="color:var(--green)">✓</span><span>Scripts prontos para copiar</span></div>
+          <div class="mod-box-row"><span style="color:var(--green)">✓</span><span>Checklists de execução</span></div>
+          <div class="mod-box-row"><span style="color:var(--green)">✓</span><span>Acesso vitalício</span></div>
+        </div>
+      </div>
+      <div class="ch-list reveal d2">
+        <div class="ch"><span class="ch-num">01</span><span class="ch-title">Por que seu Instagram não está vendendo</span><span class="ch-badge">Diagnóstico</span></div>
+        <div class="ch"><span class="ch-num">02</span><span class="ch-title">Conhecendo seu cliente local</span><span class="ch-badge">Estratégia</span></div>
+        <div class="ch"><span class="ch-num">03</span><span class="ch-title">Perfil que vende — checklist de 12 pontos</span><span class="ch-badge">Execução</span></div>
+        <div class="ch"><span class="ch-num">04</span><span class="ch-title">Conteúdo que atrai — Fase da Visibilidade</span><span class="ch-badge">V.E.C.</span></div>
+        <div class="ch"><span class="ch-num">05</span><span class="ch-title">Conteúdo que aquece — Fase do Engajamento</span><span class="ch-badge">V.E.C.</span></div>
+        <div class="ch"><span class="ch-num">06</span><span class="ch-title">Conteúdo que vende — Fase da Conversão</span><span class="ch-badge">V.E.C.</span></div>
+        <div class="ch"><span class="ch-num">07</span><span class="ch-title">O poder do direct — scripts completos</span><span class="ch-badge">Scripts</span></div>
+        <div class="ch"><span class="ch-num">08</span><span class="ch-title">WhatsApp como canal de vendas</span><span class="ch-badge">Scripts</span></div>
+        <div class="ch"><span class="ch-num">09</span><span class="ch-title">Reels para negócios locais — fórmulas</span><span class="ch-badge">Vídeo</span></div>
+        <div class="ch"><span class="ch-num">10</span><span class="ch-title">Stories que convertem em 24 horas</span><span class="ch-badge">Stories</span></div>
+        <div class="ch"><span class="ch-num">11</span><span class="ch-title">Seu plano de 30 dias — cronograma</span><span class="ch-badge">Plano</span></div>
+        <div class="ch"><span class="ch-num">12</span><span class="ch-title">Métricas que importam — e quais ignorar</span><span class="ch-badge">Análise</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="bonus-sec" id="bonus">
+  <div class="container">
+    <div class="bonus-hdr reveal">
+      <div class="eyebrow eyebrow-center">Bônus inclusos</div>
+      <h2 class="sh2" style="text-align:center">6 ferramentas para<br>executar a partir de hoje.</h2>
+      <p class="slead" style="margin:0 auto;text-align:center">Não são bônus decorativos. São ferramentas de uso imediato — você aplica hoje, não estuda para nunca aplicar.</p>
+    </div>
+    <div class="bonus-grid reveal d1">
+      <div class="bcard"><div class="bcard-glow"></div><span class="btag">Bônus 1</span><h3>Calendário de 30 Dias</h3><p>Plano diário com tema, formato e objetivo. Sem dúvidas sobre o que postar — é só executar.</p><div class="bval"><s>R$ 27</s><span class="free">Incluso</span></div></div>
+      <div class="bcard"><div class="bcard-glow"></div><span class="btag">Bônus 2</span><h3>50 Ideias de Posts</h3><p>Por segmento: salão, barbearia, joalheria, restaurante e clínica. Adaptadas ao tom de cada nicho.</p><div class="bval"><s>R$ 27</s><span class="free">Incluso</span></div></div>
+      <div class="bcard"><div class="bcard-glow"></div><span class="btag">Bônus 3</span><h3>30 Frases de CTA</h3><p>Para direct, WhatsApp e posts. Testadas para gerar ação — não curtida. Copie e use agora.</p><div class="bval"><s>R$ 17</s><span class="free">Incluso</span></div></div>
+      <div class="bcard"><div class="bcard-glow"></div><span class="btag">Bônus 4</span><h3>Scripts Direct + WhatsApp</h3><p>Respostas prontas para interesse, objeção, fechamento e pós-venda. Com exemplos do errado e do certo.</p><div class="bval"><s>R$ 37</s><span class="free">Incluso</span></div></div>
+      <div class="bcard"><div class="bcard-glow"></div><span class="btag">Bônus 5</span><h3>Checklist do Perfil</h3><p>32 pontos de auditoria para corrigir o perfil hoje mesmo. Bio, foto, destaques, link e mais.</p><div class="bval"><s>R$ 17</s><span class="free">Incluso</span></div></div>
+      <div class="bcard"><div class="bcard-glow"></div><span class="btag">Bônus 6</span><h3>Modelo de Oferta Semanal</h3><p>Modelo editável com urgência e chamada para ação. Adaptável a qualquer segmento. Uma oferta por semana.</p><div class="bval"><s>R$ 17</s><span class="free">Incluso</span></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="obj-sec" id="objections">
+  <div class="container-sm">
+    <div class="reveal">
+      <div class="eyebrow">Suas dúvidas</div>
+      <h2 class="sh2">As objeções mais comuns.<br>Sem enrolação.</h2>
+    </div>
+    <div class="obj-grid">
+      <div class="ocard reveal d1"><div class="ocard-q">Não tenho tempo para implementar.</div><p class="ocard-a">O plano semanal leva menos de 2 horas para executar. Se você tem tempo para postar sem estratégia, você tem tempo para isso.</p><div class="ocard-bar"></div></div>
+      <div class="ocard reveal d2"><div class="ocard-q">Não entendo nada de marketing digital.</div><p class="ocard-a">Melhor ainda. O Vitrine Digital começa do zero, em linguagem humana, com exemplos de negócios locais reais.</p><div class="ocard-bar"></div></div>
+      <div class="ocard reveal d1"><div class="ocard-q">Já comprei cursos e não funcionou.</div><p class="ocard-a">Cursos genéricos ensinam marketing para qualquer público. Aqui cada estratégia foi pensada para negócio local. É diferente — feito especificamente para isso.</p><div class="ocard-bar"></div></div>
+      <div class="ocard reveal d2"><div class="ocard-q">Não tenho dinheiro para anúncio.</div><p class="ocard-a">O método funciona inteiro sem anúncio pago. Reels orgânicos, alcance local e stories — para quem não quer depender de mídia paga.</p><div class="ocard-bar"></div></div>
+      <div class="ocard reveal" style="grid-column:1/-1"><div class="ocard-q">Vou comprar e deixar na gaveta.</div><p class="ocard-a">Por isso o produto inclui Calendário de 30 Dias, Checklist de Perfil e Scripts prontos. São ferramentas de execução, não de leitura. Você usa hoje — não estuda para nunca aplicar.</p><div class="ocard-bar"></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="offer-sec" id="offer">
+  <div class="offer-wrap">
+    <div class="reveal">
+      <div class="eyebrow eyebrow-center">Sua oferta</div>
+      <h2 class="sh2" style="text-align:center">Tudo que você recebe<br>por R$ 67.</h2>
+    </div>
+    <div class="offer-box reveal d1">
+      <div class="offer-glow"></div>
+      <div class="offer-corner"></div>
+      <div class="offer-items">
+        <div class="orow"><span class="orow-n"><b>E-book Vitrine Digital</b> — 12 capítulos</span><span class="orow-v">R$ 97</span></div>
+        <div class="orow"><span class="orow-n">Bônus 1 — Calendário de 30 Dias</span><span class="orow-v">R$ 27</span></div>
+        <div class="orow"><span class="orow-n">Bônus 2 — 50 Ideias de Posts</span><span class="orow-v">R$ 27</span></div>
+        <div class="orow"><span class="orow-n">Bônus 3 — 30 Frases de CTA</span><span class="orow-v">R$ 17</span></div>
+        <div class="orow"><span class="orow-n">Bônus 4 — Scripts Direct + WhatsApp</span><span class="orow-v">R$ 37</span></div>
+        <div class="orow"><span class="orow-n">Bônus 5 — Checklist do Perfil</span><span class="orow-v">R$ 17</span></div>
+        <div class="orow"><span class="orow-n">Bônus 6 — Modelo de Oferta Semanal</span><span class="orow-v">R$ 17</span></div>
+        <div class="orow tot"><span class="orow-n">Total do pacote</span><span class="orow-v" style="text-decoration:line-through;color:var(--muted)">R$ 239</span></div>
+      </div>
+      <p class="price-from">Valor total: <s>R$ 239</s></p>
+      <p class="price-main"><span class="price-pre">R$</span> 67</p>
+      <p class="price-note">pagamento único • acesso vitalício • entrega imediata</p>
+      <a href="https://pay.kiwify.com.br/Qmlm4E8" target="_blank" class="cta-main" style="text-decoration:none;display:block">Garantir meu acesso agora &rarr;</a>
+      <div class="guarantee">
+        <div class="g-icon">🛡</div>
+        <div class="g-txt"><b>Garantia de 7 dias.</b> Se em uma semana você achar que não era para você, devolvemos 100% do valor. Sem perguntas, sem burocracia.</div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+<footer>
+  <div class="foot-logo">Vitrine Digital</div>
+  <p>Método V.E.C. para Negócios Locais<br>
+  Acesso imediato via Kiwify &bull; Garantia incondicional de 7 dias<br>
+  <span style="color:#252840">&copy; 2024 Vitrine Digital. Todos os direitos reservados.</span></p>
+</footer>
+
+<script>
+
+/* cursor */
+const cur=document.getElementById('cursor'),ring=document.getElementById('cursor-ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px'});
+(function anim(){rx+=(mx-rx)*.11;ry+=(my-ry)*.11;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(anim)})();
+document.querySelectorAll('button,a,.ch,.vec-item,.pain-card,.ocard,.bcard').forEach(el=>{
+  el.addEventListener('mouseenter',()=>document.body.classList.add('hovering'));
+  el.addEventListener('mouseleave',()=>document.body.classList.remove('hovering'));
+});
+
+/* nav + progress */
+const nav=document.getElementById('nav');
+window.addEventListener('scroll',()=>{
+  nav.classList.toggle('scrolled',scrollY>60);
+  document.getElementById('progress-bar').style.width=(scrollY/(document.body.scrollHeight-innerHeight)*100)+'%';
+},{passive:true});
+
+/* canvas particles */
+(function(){
+  const c=document.getElementById('bg-canvas'),ctx=c.getContext('2d');
+  let W,H,dots=[];
+  function resize(){W=c.width=innerWidth;H=c.height=innerHeight}
+  function init(){dots=[];const n=Math.floor(W*H/16000);for(let i=0;i<n;i++)dots.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.28,vy:(Math.random()-.5)*.28,r:Math.random()*1.1+.3,a:Math.random()*.5+.1})}
+  resize();init();
+  window.addEventListener('resize',()=>{resize();init()},{passive:true});
+  let mmx=-999,mmy=-999;
+  document.addEventListener('mousemove',e=>{mmx=e.clientX;mmy=e.clientY},{passive:true});
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    for(let i=0;i<dots.length;i++){
+      for(let j=i+1;j<dots.length;j++){
+        const dx=dots[i].x-dots[j].x,dy=dots[i].y-dots[j].y,d=Math.sqrt(dx*dx+dy*dy);
+        if(d<110){ctx.strokeStyle=`rgba(200,155,60,${.14*(1-d/110)})`;ctx.lineWidth=.4;ctx.beginPath();ctx.moveTo(dots[i].x,dots[i].y);ctx.lineTo(dots[j].x,dots[j].y);ctx.stroke()}
+      }
+    }
+    dots.forEach(d=>{
+      const dx=mmx-d.x,dy=mmy-d.y,dist=Math.sqrt(dx*dx+dy*dy);
+      if(dist<180){d.vx+=dx/dist*.018;d.vy+=dy/dist*.018}
+      d.vx*=.99;d.vy*=.99;d.x+=d.vx;d.y+=d.vy;
+      if(d.x<0)d.x=W;if(d.x>W)d.x=0;if(d.y<0)d.y=H;if(d.y>H)d.y=0;
+      ctx.fillStyle=`rgba(200,155,60,${d.a})`;ctx.beginPath();ctx.arc(d.x,d.y,d.r,0,Math.PI*2);ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* reveal */
+const ro=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')}),{threshold:.08,rootMargin:'0px 0px -30px 0px'});
+document.querySelectorAll('.reveal').forEach(el=>ro.observe(el));
+
+/* counters */
+const co=new IntersectionObserver(entries=>entries.forEach(e=>{
+  if(e.isIntersecting&&!e.target._counted){e.target._counted=1;
+    const tgt=+e.target.dataset.count;let start=0;
+    const step=ts=>{if(!start)start=ts;const p=Math.min((ts-start)/1800,1),ease=1-Math.pow(1-p,3);e.target.textContent=Math.round(ease*tgt);if(p<1)requestAnimationFrame(step)};
+    requestAnimationFrame(step)}
+}),{threshold:.5});
+document.querySelectorAll('[data-count]').forEach(el=>co.observe(el));
+
+/* floating particles in hero */
+const heroEl=document.querySelector('.hero');
+function spawn(){
+  const p=document.createElement('div');p.className='particle';
+  const sz=Math.random()*2.5+.8;
+  Object.assign(p.style,{width:sz+'px',height:sz+'px',left:Math.random()*100+'vw',bottom:'-10px',opacity:'0','animation-duration':(Math.random()*10+8)+'s','animation-delay':Math.random()*3+'s'});
+  heroEl.appendChild(p);
+  setTimeout(()=>p.remove(),16000);
+}
+for(let i=0;i<14;i++)spawn();
+setInterval(spawn,1800);
+
+/* vec tilt */
+document.querySelectorAll('.vec-item').forEach(card=>{
+  card.addEventListener('mousemove',e=>{
+    const r=card.getBoundingClientRect();
+    const dx=(e.clientX-r.left-r.width/2)/r.width,dy=(e.clientY-r.top-r.height/2)/r.height;
+    card.style.cssText='transform:translateY(-10px) rotateX('+(- dy*7)+'deg) rotateY('+(dx*7)+'deg);transition:transform .08s';
+  });
+  card.addEventListener('mouseleave',()=>{card.style.cssText='transform:translateY(0) rotateX(0) rotateY(0);transition:transform .5s'});
+});
+
+</script>
+</body>
+</html>
